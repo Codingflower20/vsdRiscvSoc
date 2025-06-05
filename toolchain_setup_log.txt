@@ -1,0 +1,30 @@
+#Week 1 Task 1: Toolchain Installation and Sanity Check
+
+# 1. Unpacked riscv-toolchain-rv32imac-x86_64-ubuntu.tar.gz to ~/riscv
+#    Command used:
+#    mkdir -p ~/riscv
+#    tar -xzf ~/Downloads/riscv-toolchain-rv32imac-x86_64-ubuntu.tar.gz -C ~/riscv --strip-components=1
+#    Status: Successful
+
+# 2. Added ~/riscv/bin to PATH in ~/.bashrc and sourced it.
+#    Command used:
+#    echo 'export PATH=$HOME/riscv/bin:$PATH' >> ~/.bashrc
+#    source ~/.bashrc
+#    Status: Successful
+
+# 3. Verification of binaries:
+
+# riscv32-unknown-elf-gcc --version
+# --- START GCC VERSION OUTPUT ---
+# (Paste the actual output of riscv32-unknown-elf-gcc --version here)
+# --- END GCC VERSION OUTPUT ---
+
+# riscv32-unknown-elf-objdump --version
+# --- START OBJDUMP VERSION OUTPUT ---
+# (Paste the actual output of riscv32-unknown-elf-objdump --version here)
+# --- END OBJDUMP VERSION OUTPUT ---
+
+# riscv32-unknown-elf-gdb --version
+# --- START GDB VERSION OUTPUT ---
+# (Paste the actual output of riscv32-unknown-elf-gdb --version here)
+# --- END GDB VERSION OUTPUT ---
