@@ -58,3 +58,18 @@ main:
         lui     a5,%hi(.LC0)
 
 ```
+## 4- Convert into Hex Dump & Disassembly
+Converted ELF into Raw Binary
+````bash
+
+riscv32-unknown-elf-objcopy -O binary hello.elf hello.bin 
+```
+Created HEXDump OF Binary
+```bash
+xd hello.bin > hello_binary_hexdump.txt 
+```
+Disassemble the ELF with objdump
+```bash
+riscv32-unknown-elf-objdump -d -M numeric,no-aliases hello.elf > hello_disassembly.txt 
+```
+
