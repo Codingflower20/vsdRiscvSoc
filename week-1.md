@@ -60,8 +60,7 @@ main:
 ```
 ## 4- Convert into Hex Dump & Disassembly
 Converted ELF into Raw Binary
-````bash
-
+```bash
 riscv32-unknown-elf-objcopy -O binary hello.elf hello.bin 
 ```
 Created HEXDump OF Binary
