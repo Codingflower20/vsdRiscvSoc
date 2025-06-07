@@ -72,8 +72,53 @@ Disassemble the ELF with objdump
 riscv32-unknown-elf-objdump -d -M numeric,no-aliases hello.elf > hello_disassembly.txt 
 ```
 
-## 5- Recompiled Everything
-```bash
-riscv32-unknown-elf-gcc -g -o hello.elf hello.c
-```
+## 5- ABI & Register Cheat-Sheet
+
+This section provides a complete list of the 32 integer registers in RV32I, along with their ABI names and conventional roles in the calling convention.
+
+###  RV32I Register Table
+
+| Register | ABI Name | Role / Description                      | Calling Convention Role     |
+|----------|----------|------------------------------------------|-----------------------------|
+| x0       | zero     | Hardwired zero                          | Constant 0                  |
+| x1       | ra       | Return address                          | Return address              |
+| x2       | sp       | Stack pointer                           | Stack pointer               |
+| x3       | gp       | Global pointer                          | Global pointer              |
+| x4       | tp       | Thread pointer                          | Thread pointer              |
+| x5       | t0       | Temporary register                      | Caller-saved                |
+| x6       | t1       | Temporary register                      | Caller-saved                |
+| x7       | t2       | Temporary register                      | Caller-saved                |
+| x8       | s0 / fp  | Saved register / Frame pointer          | Callee-saved / Frame ptr    |
+| x9       | s1       | Saved register                          | Callee-saved                |
+| x10      | a0       | Function argument / Return value        | Caller-saved / Arg/Ret      |
+| x11      | a1       | Function argument / Return value        | Caller-saved / Arg/Ret      |
+| x12      | a2       | Function argument                       | Caller-saved / Arg          |
+| x13      | a3       | Function argument                       | Caller-saved / Arg          |
+| x14      | a4       | Function argument                       | Caller-saved / Arg          |
+| x15      | a5       | Function argument                       | Caller-saved / Arg          |
+| x16      | a6       | Function argument                       | Caller-saved / Arg          |
+| x17      | a7       | Function argument                       | Caller-saved / Arg          |
+| x18      | s2       | Saved register                          | Callee-saved                |
+| x19      | s3       | Saved register                          | Callee-saved                |
+| x20      | s4       | Saved register                          | Callee-saved                |
+| x21      | s5       | Saved register                          | Callee-saved                |
+| x22      | s6       | Saved register                          | Callee-saved                |
+| x23      | s7       | Saved register                          | Callee-saved                |
+| x24      | s8       | Saved register                          | Callee-saved                |
+| x25      | s9       | Saved register                          | Callee-saved                |
+| x26      | s10      | Saved register                          | Callee-saved                |
+| x27      | s11      | Saved register                          | Callee-saved                |
+| x28      | t3       | Temporary register                      | Caller-saved                |
+| x29      | t4       | Temporary register                      | Caller-saved                |
+| x30      | t5       | Temporary register                      | Caller-saved                |
+| x31      | t6       | Temporary register                      | Caller-saved                |
+
+###  Calling Convention Summary
+
+- `a0`–`a7`: Function **arguments and return values**
+- `s0`–`s11`: **Callee-saved** registers
+- `t0`–`t6`: **Caller-saved** registers
+- `ra`: Return address
+- `sp`: Stack pointer
+
 
