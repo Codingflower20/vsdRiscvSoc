@@ -618,3 +618,65 @@ Global/static variables are correctly handled.
 main() runs without an OS.
 
 Compatible with simulators like QEMU or Spike.
+
+
+## Task 13: Demonstrate how to make a machine-Timer-Interrupt(MITP),Simple handler in C:
+Enable the Machine Timer Interrupt (MTIP)
+
+Write a simple interrupt handler in C or assembly
+
+Understand how to configure and acknowledge interrupts on RISC-V
+
+Step 1: Understand the Key Registers
+Register	Purpose
+mtime	64-bit timer that keeps incrementing
+mtimecmp	Timer compare register — when mtime >= mtimecmp, MTIP is set
+mstatus	Global interrupt enable (MIE)
+mie	Interrupt enable for individual sources (enable MTIP here)
+mcause	Indicates what caused the interrupt
+
+Step 2: Memory-Mapped Timer Registers (Typical for QEMU/Spike)
+Register	Address
+mtime	0x0200BFF8 (64-bit)
+mtimecmp	0x02004000 (64-bit)
+
+Note: Your actual platform may vary — this is for QEMU/Spike with --machine virt.
+
+basic handler : 
+```c
+#include <stdint.h>
+
+#define MTIME       (*(volatile uint64_t*)0x0200BFF8)
+#define MTIMECMP    (*(volatile uint64_t*)0x02004000)
+#define MSTATUS_MIE (1 << 3)
+#define MIE_MTIE    (1 << 7)
+
+void trap_handler(void) __attribute__((interrupt));
+void trap_handler(void) {
+    // Acknowledge timer interrupt by setting next mtimecmp
+    MTIMECMP = MTIME + 1000000;
+
+    // Do something (e.g., toggle GPIO or counter)
+}
+
+void enable_timer_interrupt() {
+    MTIMECMP = MTIME + 1000000;           // Schedule first interrupt
+
+    asm volatile("csrs mie, %0" :: "r"(MIE_MTIE));   // Enable timer interrupt
+    asm volatile("csrs mstatus, %0" :: "r"(MSTATUS_MIE)); // Enable global interrupts
+}
+
+int main() {
+    enable_timer_interrupt();
+    while (1); // Wait for interrupts
+}
+```
+Summary :
+
+Configured a RISC-V timer interrupt using mtimecmp
+
+Wrote a basic interrupt handler in C
+
+Set the mtvec register to handle traps
+
+Successfully created a timer-based event system

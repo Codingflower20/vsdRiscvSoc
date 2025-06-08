@@ -1,0 +1,57 @@
+#include <stdint.h>
+
+// Memory-mapped registers for Virt machine in QEMU
+#define CLINT_BASE 0x2000000
+#define MTIME (volatile uint64_t*)(CLINT_BASE + 0xBFF8)
+#define MTIMECMP (volatile uint64_t*)(CLINT_BASE + 0x4000)
+
+// CSR addresses
+#define CSR_MSTATUS 0x300
+#define CSR_MIE 0x304
+#define CSR_MTVEC 0x305
+
+// Interrupt enable bits
+#define MIE_MTIE (1 << 7)
+
+// Simple counter
+volatile uint32_t interrupt_count = 0;
+
+// Set MTIMECMP safely (avoids spurious interrupts)
+void set_mtimecmp(uint64_t value) {
+    // Disable interrupts
+    asm volatile ("csrc mstatus, %0" :: "r"(0x8));
+    
+    // Write MTIMECMP
+    *MTIMECMP = value;
+    
+    // Re-enable interrupts
+    asm volatile ("csrs mstatus, %0" :: "r"(0x8));
+}
+
+// Timer interrupt handler
+__attribute__((interrupt("machine"))) void timer_handler() {
+    interrupt_count++;
+    
+    // Schedule next interrupt in 1 second (assuming 10MHz clock)
+    set_mtimecmp(*MTIME + 10000000);
+}
+
+void main() {
+    // Set trap vector
+    asm volatile ("csrw mtvec, %0" :: "r"(timer_handler));
+    
+    // Enable timer interrupts
+    asm volatile ("csrs mie, %0" :: "r"(MIE_MTIE));
+    
+    // Enable global interrupts
+    asm volatile ("csrs mstatus, %0" :: "r"(0x8));
+    
+    // Set first timer interrupt
+    set_mtimecmp(*MTIME + 10000000);
+    
+    // Main loop
+    while (1) {
+        // The timer interrupt will fire periodically
+        asm volatile ("wfi");
+    }
+}
