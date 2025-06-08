@@ -238,3 +238,65 @@ No debug symbols: Recompile with -g flag.
 Architecture issues: In GDB, run set architecture riscv:rv32.
 
 ### Screenshot
+
+Here's a clean, professional README.md for your GitHub repository covering Task 8 (GCC Optimization Analysis):
+
+markdown
+# RISC-V GCC Optimization Comparison
+
+## Task 8: Exploring Compiler Optimizations
+Compare how different GCC optimization levels affect RISC-V assembly output.
+
+### Quick Start
+```bash
+# Generate assembly files
+riscv32-unknown-elf-gcc -S -O0 -o hello-O0.s hello.c  # No optimization
+riscv32-unknown-elf-gcc -S -O2 -o hello-O2.s hello.c  # With optimizations
+```
+### Compare differences
+Key Differences in Assembly
+1. Dead Code Elimination
+-O0: Keeps unused variables/operations.
+
+-O2: Removes dead code (e.g., unused variables, redundant calculations).
+
+2. Register Allocation
+-O0: Uses memory (stack) heavily, fewer register optimizations.
+
+-O2: Maximizes register usage (e.g., a0-a7, s0-s11) to reduce memory accesses.
+
+3. Function Inlining
+-O0: Calls functions explicitly (e.g., jal for printf).
+
+-O2: Inlines small functions (replaces calls with direct code).
+
+4. Loop Unrolling
+-O0: Preserves original loop structure.
+
+-O2: Unrolls loops (reduces branch overhead).
+-O0 Assembly (No Optimization)
+asm
+main:
+    addi    sp,sp,-16
+    sw      ra,12(sp)
+    li      a0,5           # Dead store (never used)
+    lui     a0,%hi(.LC0)
+    addi    a0,a0,%lo(.LC0)
+    jal     ra,printf      # Normal function call
+    li      a0,0
+    lw      ra,12(sp)
+    addi    sp,sp,16
+    ret
+-O2 Assembly (Optimized)
+asm
+main:
+    lui     a0,%hi(.LC0)
+    addi    a0,a0,%lo(.LC0)
+    tail    printf         # Tail call optimization
+How to Analyze
+Compile with both optimization levels
+Compare the files using 
+```bash
+diff -y hello-O0.s hello-O2.s
+```
+### Screenshots
