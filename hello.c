@@ -1,7 +1,7 @@
-// hello.c
-#include <stdio.h>
-
 int main() {
-    printf("Hello, RISC-V!\n");
+    volatile int a = 10;
+    volatile int b = 20;
+    volatile int c = a + b;  // You will step through this
     return 0;
 }
+
