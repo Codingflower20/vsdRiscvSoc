@@ -450,7 +450,7 @@ Objective
 
 - `hello.c`: A simple Hello World C program
 - `linker.ld`: Custom linker script defining memory layout
-- `README.md`: This file
+- `week-1.md`: This file
 
 ---
 
@@ -511,3 +511,110 @@ Have .data and .bss in SRAM at 0x10000000+
 Link without errors or section overlap
 
 ### Screenshots 
+
+# Task 12: Start-up Code and `crt0` – RISC-V Bare-Metal
+
+This task demonstrates how to implement the **startup code** (`crt0.S`) required to boot a bare-metal RISC-V application. The `crt0` code sets up the environment before calling `main()`, and is essential for systems that do not rely on an operating system.
+
+---
+
+ Purpose
+
+In a bare-metal embedded system:
+- There's no OS to initialize RAM, stack, or call `main()`.
+- The startup file (`crt0.S`) must do this manually.
+
+---
+
+ What `crt0.S` Does
+
+1. Set the **stack pointer (`sp`)**.
+2. Copy **.data** section from flash to RAM.
+3. Zero out the **.bss** section.
+4. Call the **`main()`** function.
+5. Halt the CPU in an **infinite loop** after `main()` returns.
+
+---
+
+Files
+
+- `crt0.S`: Startup assembly code.
+- `hello.c`: Minimal C program (e.g., toggling a GPIO).
+- `linker.ld`: Custom linker script that defines memory layout and section symbols.
+- `week-1.md`: This documentation.
+
+---
+
+Linker Script Snippet (`linker.ld`)
+
+Ensure these definitions exist **outside the `SECTIONS` block**:
+
+```ld
+_stack_top = ORIGIN(RAM) + LENGTH(RAM);
+
+PROVIDE(_data_start = ADDR(.data));
+PROVIDE(_data_end   = ADDR(.data) + SIZEOF(.data));
+PROVIDE(_data_load  = LOADADDR(.data));
+PROVIDE(_bss_start  = ADDR(.bss));
+PROVIDE(_bss_end    = ADDR(.bss) + SIZEOF(.bss));
+```
+crt0.S
+```crt0
+.section .text
+.globl _start
+_start:
+    la sp, _stack_top
+
+    # Copy .data from Flash to RAM
+    la a0, _data_load
+    la a1, _data_start
+    la a2, _data_end
+1:
+    beq a1, a2, 2f
+    lw t0, 0(a0)
+    sw t0, 0(a1)
+    addi a0, a0, 4
+    addi a1, a1, 4
+    j 1b
+2:
+
+    # Zero .bss
+    la a0, _bss_start
+    la a1, _bss_end
+3:
+    beq a0, a1, 4f
+    sw zero, 0(a0)
+    addi a0, a0, 4
+    j 3b
+4:
+
+    call main
+    j .  # Infinite loop after main
+```
+Updated hello.c
+```c
+int main() {
+    volatile int *gpio = (int*)0x10012000;
+    *gpio = 0x1;
+    while (1);
+}
+```
+Build & Run
+```bash
+riscv32-unknown-elf-gcc -march=rv32imc -mabi=ilp32 -nostartfiles -T linker.ld crt0.S hello.c -o hello.elf
+```
+Dissassemble
+```bash
+riscv32-unknown-elf-objdump -d hello.elf
+```
+Outcome
+
+You now have a fully bare-metal RISC-V binary:
+
+Stack pointer is initialized.
+
+Global/static variables are correctly handled.
+
+main() runs without an OS.
+
+Compatible with simulators like QEMU or Spike.

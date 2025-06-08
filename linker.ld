@@ -38,3 +38,10 @@ SECTIONS
   PROVIDE(__bss_start = _bss_start);
   PROVIDE(_end = .);
 }
+_stack_top = ORIGIN(RAM) + LENGTH(RAM);
+
+  PROVIDE(_data_start = .);
+  PROVIDE(_data_end = .);
+  PROVIDE(_data_load = LOADADDR(.data));
+  PROVIDE(_bss_start = .);
+  PROVIDE(_bss_end = .);
