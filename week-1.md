@@ -300,3 +300,97 @@ Compare the files using
 diff -y hello-O0.s hello-O2.s
 ```
 ### Screenshots
+
+## Task 9: Inline Assembly for Reading RISC-V Cycle Counter
+Objective: Learn to read the RISC-V cycle CSR (Counter Register) using inline assembly in C, with detailed explanations of constraints and keywords.
+
+Solution Code
+```c
+#include <stdint.h>
+
+// Read the 32-bit cycle counter (CSR 0xC00)
+static inline uint32_t rdcycle(void) {
+    uint32_t cycles;
+    asm volatile ("csrr %0, cycle" : "=r"(cycles));
+    return cycles;
+}
+```
+Key Components Explained
+1. asm volatile
+asm → Introduces inline assembly in C.
+
+volatile → Instructs the compiler:
+
+Do not optimize this assembly (keeps it even if outputs appear unused).
+
+Do not reorder it relative to other volatile operations (critical for cycle counting).
+
+2. csrr %0, cycle
+csrr → RISC-V instruction for "Control Status Register Read".
+
+cycle → CSR address 0xC00 (mnemonic alias for the cycle counter).
+
+%0 → Refers to the first output operand (cycles in this case).
+
+3. Output Constraint "=r"(cycles)
+"=r" → Specifies:
+
+= → Output operand (written by the assembly).
+
+r → Store in a general-purpose register (e.g., a0, t0).
+
+(cycles) → C variable that receives the result.
+
+Example Usage
+```c
+#include <stdio.h>
+
+int main() {
+    uint32_t start = rdcycle();
+    // Code to measure...
+    uint32_t end = rdcycle();
+    printf("Cycles elapsed: %u\n", end - start);
+    return 0;
+}
+```
+Why This Works?
+csrr Instruction → Reads the cycle CSR (a 32-bit counter incrementing every clock cycle).
+
+Constraint "=r" → Ensures GCC:
+
+Assigns cycles to a register (e.g., a0, t0).
+
+Does not optimize away the read.
+
+volatile → Guarantees the read happens exactly once (no reordering/deletion).
+
+Alternative: Direct CSR Number
+If your toolchain doesn’t recognize cycle, use the CSR address directly:
+
+```c
+asm volatile ("csrr %0, 0xC00" : "=r"(cycles));  // Equivalent to "cycle"
+```
+Common Pitfalls
+Mistake	Consequence	Fix
+Missing volatile	GCC may delete "unused" reads.	Always use volatile.
+Wrong constraint ("=m")	Forces memory access (slower).	Use "=r" for registers.
+64-bit counters (RV64)	uint32_t overflows.	Use uint64_t (see below).
+Extensions
+1. Reading 64-bit Cycle Counters (RV64)
+```c
+static inline uint64_t rdcycle64(void) {
+    uint64_t cycles;
+    asm volatile ("csrr %0, cycle" : "=r"(cycles));  // RV64 reads full 64 bits
+    return cycles;
+}
+```
+2. Reading Other CSRs
+CSR Name	Address	Description	Example
+time	0xC01	Wall-clock timer	asm ("csrr %0, time" : "=r"(t));
+instret	0xC02	Instructions retired	asm ("csrr %0, instret" : "=r"(count));
+Key Takeaways
+Component	Purpose
+asm volatile	Ensures assembly is not optimized/reordered.
+"=r"(var)	Output operand in a register, mapped to var.
+csrr	RISC-V CSR read instruction.
+cycle	Hardware counter for cycles since reset (CSR 0xC00).
