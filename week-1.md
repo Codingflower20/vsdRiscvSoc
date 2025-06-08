@@ -394,3 +394,42 @@ asm volatile	Ensures assembly is not optimized/reordered.
 "=r"(var)	Output operand in a register, mapped to var.
 csrr	RISC-V CSR read instruction.
 cycle	Hardware counter for cycles since reset (CSR 0xC00).
+
+## Week 10 Task: Memory-Mapped I/O GPIO Control
+Objective
+Demonstrate bare-metal memory-mapped I/O by toggling a GPIO register at 0x10012000 while preventing compiler optimizations.
+
+Solution Code
+```c
+#include <stdint.h>
+
+// Memory-mapped GPIO register (volatile + const correctness)
+volatile uint32_t * const GPIO = (volatile uint32_t *)0x10012000;
+
+void toggle_led() {
+    *GPIO = 0x1;          // Write to register
+    (void)*GPIO;          // Read-back barrier (optional)
+}```
+Key Concepts Applied
+volatile Keyword:
+
+Essential for hardware register access
+
+Prevents compiler from optimizing away or reordering accesses
+
+Indicates value may change outside program control
+
+Alignment:
+
+Hardware registers typically require natural alignment
+
+Address 0x10012000 is properly aligned for 32-bit access (divisible by 4)
+
+Pointer Declaration:
+
+volatile uint32_t * const creates a constant pointer to volatile data
+
+Pointer itself cannot be changed (const)
+
+Pointed-to data is volatile (can't be optimized)
+
