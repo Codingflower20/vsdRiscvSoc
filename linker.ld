@@ -1,21 +1,40 @@
 ENTRY(_start)
 
-MEMORY {
-  RAM (rwx) : ORIGIN = 0x80000000, LENGTH = 64K
+MEMORY
+{
+  FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K
+  RAM (rwx)  : ORIGIN = 0x10000000, LENGTH = 64K
 }
 
-SECTIONS {
-  .text : {
+SECTIONS
+{
+  .text : 
+  {
     *(.text*)
     *(.rodata*)
-  } > RAM
+    *(.eh_frame*)
+  } > FLASH
 
-  .data : {
+  .data : 
+  {
+    _data_start = .;
     *(.data*)
+    *(.sdata*)
+    _data_end = .;
+  } > RAM AT > FLASH
+
+  .bss (NOLOAD) : 
+  {
+    _bss_start = .;
+    *(.bss*)
+    *(.sbss*)
+    *(COMMON)
+    _bss_end = .;
   } > RAM
 
-  .bss : {
-    *(.bss*)
-    *(COMMON)
-  } > RAM
+  PROVIDE(__global_pointer$ = _data_start + 0x800);  /* GP is near .sdata */
+
+  /* Define memory region symbols */
+  PROVIDE(__bss_start = _bss_start);
+  PROVIDE(_end = .);
 }
