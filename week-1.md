@@ -809,3 +809,110 @@ info registers
 ```
 ### Screenshots
 
+## Task 16 : Using Newlib printf Without an OS
+
+Explanation and Objective
+
+Task 16 is a continuation of Task 15 and focuses on using atomic operations in RISC-V in a bare-metal environment to simulate synchronization between multiple threads (or cores). The setup is similar to Task 15, but Task 16 emphasizes:
+
+1. Using atomic RISC-V instructions (lr.w, sc.w) for lock-free synchronization
+
+2. Observing the result of concurrent access to a shared variable (shared_counter)
+
+3. Using QEMU for multi-core simulation and GDB for inspection
+
+Goal:
+1. Implement atomic increment of a global variable from two functions running in parallel (simulated as threads).
+2. Verify the final value using gdb.
+
+task16.c
+
+```c
+// task16.c
+volatile int shared_counter = 0;
+
+void thread1() {
+    for (int i = 0; i < 3; i++) {
+        __sync_fetch_and_add(&shared_counter, 1);
+    }
+}
+
+void thread2() {
+    for (int i = 0; i < 3; i++) {
+        __sync_fetch_and_add(&shared_counter, 1);
+    }
+}
+
+int main() {
+    thread1();
+    thread2();
+    return 0;
+}
+```
+
+link16.ld
+ 
+```ld
+ENTRY(_start)
+
+MEMORY {
+    RAM (rwx) : ORIGIN = 0x80000000, LENGTH = 128K
+}
+SECTIONS {
+    . = ORIGIN(RAM);
+    .text : {
+        *(.text*)
+    }
+
+    .rodata : {
+        *(.rodata*)
+    }
+
+    .data : {
+        *(.data*)
+    }
+
+    .bss : {
+        *(.bss*)
+        *(COMMON)
+    }
+
+    _stack_top = . + 2048;
+}
+```
+start16.S
+
+```S
+    .section .text
+    .globl _start
+_start:
+    la sp, _stack_top
+    call main
+1:  j 1b
+
+    .section .bss
+    .space 2048
+_stack_top:
+```
+
+Compiled Using
+```bash
+riscv32-unknown-elf-gcc -g -nostartfiles -T link16.ld start16.S task16.c -o task16.elf
+```
+Emulated via Qemu
+```bash
+riscv32-unknown-elf-gcc -g -nostartfiles -T link15.ld start16.S task16.c -o task16.elf
+```
+Connet gdb to qemu
+
+```bash
+riscv32-unknown-elf-gdb task16.elf
+```
+GDB Commands
+```GDB
+(gdb)target main :1234
+(gdb)b main
+(gdb)c
+(gdb)print shared_counter
+```
+### Screenshots
