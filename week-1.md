@@ -1,11 +1,11 @@
 # Week-1 tasks
 This contains progress and solutions of week 1 tasks.
-## 1- Setup ToolChain
+## Task 1: Setup ToolChain
 Extracted the ToolChain using 
 ```bash
 tar -xzf
 ```
-## 2- Hello.C
+## Task 2: Hello.C
 Created the Hello.c file
 ```C
 // hello.c
@@ -29,7 +29,7 @@ Output
 ```bash
 hello.elf: ELF 32-bit LSB executable, UCB RISC-V, RVC, soft-float ABI, version 1 (SYSV), statically linked, not stripped
 ```
-## 3- Hello.S
+## Task 3: Hello.S
 Converted the C code into Assembly language
 ```bash
 riscv32-unknown-elf-gcc -S -O0 hello.c
@@ -58,7 +58,7 @@ main:
         lui     a5,%hi(.LC0)
 
 ```
-## 4- Convert into Hex Dump & Disassembly
+## Task 4: Convert into Hex Dump & Disassembly
 Converted ELF into Raw Binary
 ```bash
 riscv32-unknown-elf-objcopy -O binary hello.elf hello.bin 
@@ -72,7 +72,7 @@ Disassemble the ELF with objdump
 riscv32-unknown-elf-objdump -d -M numeric,no-aliases hello.elf > hello_disassembly.txt 
 ```
 
-## 5- ABI & Register Cheat-Sheet
+## Task 5: ABI & Register Cheat-Sheet
 
 This section provides a complete list of the 32 integer registers in RV32I, along with their ABI names and conventional roles in the calling convention.
 
@@ -179,6 +179,7 @@ No debug symbols: Recompile with -g flag.
 Architecture issues: In GDB, run set architecture riscv:rv32.
 
 ### Screenshot
+![Screenshot of result](Screenshots/Task6.png)
 
 We didnt see the expected result as we weren't using emulator.This hasn been addressed in task 7. 
 
@@ -238,6 +239,7 @@ No debug symbols: Recompile with -g flag.
 Architecture issues: In GDB, run set architecture riscv:rv32.
 
 ### Screenshot
+![Screenshot of result](Screenshots/Task7.png)
 
 Here's a clean, professional README.md for your GitHub repository covering Task 8 (GCC Optimization Analysis):
 
@@ -300,6 +302,7 @@ Compare the files using
 diff -y hello-O0.s hello-O2.s
 ```
 ### Screenshots
+![Screenshot of result](Screenshots/Task8.png)
 
 ## Task 9: Inline Assembly for Reading RISC-V Cycle Counter
 Objective: Learn to read the RISC-V cycle CSR (Counter Register) using inline assembly in C, with detailed explanations of constraints and keywords.
@@ -395,7 +398,7 @@ asm volatile	Ensures assembly is not optimized/reordered.
 csrr	RISC-V CSR read instruction.
 cycle	Hardware counter for cycles since reset (CSR 0xC00).
 
-## Week 10 Task: Memory-Mapped I/O GPIO Control
+## Task 10: Memory-Mapped I/O GPIO Control
 Objective
 Demonstrate bare-metal memory-mapped I/O by toggling a GPIO register at 0x10012000 while preventing compiler optimizations.
 
@@ -511,6 +514,7 @@ Have .data and .bss in SRAM at 0x10000000+
 Link without errors or section overlap
 
 ### Screenshots 
+![Screenshot of result](Screenshots/Task11.png)
 
 # Task 12: Start-up Code and `crt0` – RISC-V Bare-Metal
 
@@ -618,7 +622,8 @@ Global/static variables are correctly handled.
 main() runs without an OS.
 
 Compatible with simulators like QEMU or Spike.
-
+### Screenshots 
+![Screenshot of result](Screenshots/Task12.png)
 
 ## Task 13: Demonstrate how to make a machine-Timer-Interrupt(MITP),Simple handler in C:
 Enable the Machine Timer Interrupt (MTIP)
@@ -681,6 +686,9 @@ Set the mtvec register to handle traps
 
 Successfully created a timer-based event system
 
+### Screenshots
+![Screenshot of result](Screenshots/Task13.png)
+
 ## Task 14: rv32imac vs rv32imc – What’s the “A”?
 Question 
 **“Explain the ‘A’ (atomic) extension in rv32imac. What instructions are added and why are they useful?”**
@@ -716,7 +724,7 @@ Summary
 - It is essential for low-level OS and embedded systems programming.
 - It **distinguishes `rv32imac` (which supports atomics)** from `rv32imc` (which does not)
 
-## 15- Spin-lock implementation in C with inline asm fallback.
+## Task 15: Spin-lock implementation in C with inline asm fallback.
 Objective:
 Understand and implement atomic operations in bare-metal RISC-V to safely update a shared variable (shared_counter) in a multi-thread-like context (simulated).
 Core Concepts:
@@ -812,8 +820,9 @@ GDB Commands
 (gdb)info registers
 ```
 ### ScreenShots
+![Screenshot of result](Screenshots/Task15.png)
 
-## 16- Using Newlib printf Without an OS
+## Task 16:Using Newlib printf Without an OS
 
 Explanation and Objective:
 Task 16 is a continuation of Task 15 and focuses on using atomic operations in RISC-V in a bare-metal environment to simulate synchronization between multiple threads (or cores). The setup is similar to Task 15, but Task 16 emphasizes on:
@@ -917,8 +926,9 @@ GDB Commands
 (gdb)print shared_counter
 ```
 ### ScreenShots
+![Screenshot of result](Screenshots/Task16.png)
 
-## 17- RISC-V Bare-Metal – Thread Scheduling and Mutex (Using qemu-riscv32, GDB, and Atomics)
+## Task 17: RISC-V Bare-Metal – Thread Scheduling and Mutex (Using qemu-riscv32, GDB, and Atomics)
 Objective
 1. To understand and implement preemptive multithreading using RISC-V atomic instructions and mutual exclusion (mutex) in a bare-metal environment using QEMU and GDB.
 
@@ -1054,4 +1064,4 @@ GDB Commands
 (gdb)print shared_counter
 ```
 ### ScreenShots
-	
+![Screenshot of result](Screenshots/Task17.png)	
