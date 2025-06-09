@@ -681,61 +681,7 @@ Set the mtvec register to handle traps
 
 Successfully created a timer-based event system
 
-# 14. rv32imac vs rv32imc – What’s the “A”?</strong>
-
-### Question  
-**“Explain the ‘A’ (atomic) extension in rv32imac. What instructions are added and why are they useful?”**
-
----
-
-### What is the “A” Extension?
-
-- The **“A” stands for Atomic** — it adds **atomic read-modify-write** instructions.
-- These instructions allow for **safe, hardware-supported access to shared memory**.
-- It is used when multiple cores/threads need to access the same variable without conflicts.
-
----
-
-###  Instructions Introduced by the "A" Extension
-
-| Instruction   | Meaning                             | Purpose                            |
-|---------------|--------------------------------------|-------------------------------------|
-| `lr.w`        | Load-Reserved word                   | Starts an atomic load-store block   |
-| `sc.w`        | Store-Conditional word               | Stores only if no one else touched |
-| `amoadd.w`    | Atomic add                           | Adds a value atomically             |
-| `amoswap.w`   | Atomic swap                          | Atomically swaps memory             |
-| `amoand.w`    | Atomic AND                           | Useful for bitmask flags            |
-| `amoor.w`     | Atomic OR                            | Used in setting flags atomically    |
-
----
-
-###  Use Cases
-
-- **Operating Systems**: Manage shared memory between tasks/interrupts.
-- **Multithreading**: Protect shared counters or variables.
-- **Lock-Free Data Structures**: Like queues or stacks, to avoid performance penalties from locking.
-
----
-
-###  Analogy
-
-Imagine you're writing on a shared whiteboard:
-
-- `lr.w` → You reserve a spot to write.  
-- `sc.w` → You try to write, but **only succeed if no one else has written there** since you reserved it.  
-- `amoadd.w` → You **add a number** to the current value, and it's done **safely**, even if others are trying at the same time.
-
----
-
-### Summary
-
-- The “A” extension makes **safe concurrent memory access** possible in RISC-V.
-- It is essential for low-level OS and embedded systems programming.
-- It **distinguishes `rv32imac` (which supports atomics)** from `rv32imc` (which does not).
-
----
-
-## 14. rv32imac vs rv32imc – What’s the “A”?
+## Task 14: rv32imac vs rv32imc – What’s the “A”?
 Question 
 **“Explain the ‘A’ (atomic) extension in rv32imac. What instructions are added and why are they useful?”**
 
@@ -769,3 +715,97 @@ Summary
 - The “A” extension makes **safe concurrent memory access** possible in RISC-V.
 - It is essential for low-level OS and embedded systems programming.
 - It **distinguishes `rv32imac` (which supports atomics)** from `rv32imc` (which does not)
+
+## Task 15: Spin-lock implementation in C with inline asm fallback
+Objective:
+Understand and implement atomic operations in bare-metal RISC-V to safely update a shared variable (shared_counter) in a multi-thread-like context (simulated).
+
+🧠 Core Concepts:
+1. Atomic Operations
+An atomic operation is one that completes as a single, uninterruptible unit.
+
+In RISC-V, atomic operations prevent race conditions when multiple "threads" access shared memory.
+
+2. LR/SC Pair (Load-Reserved / Store-Conditional)
+RISC-V uses lr.w (load-reserved) and sc.w (store-conditional) for atomic operations.
+
+These ensure a variable is only updated if no one else has written to it between the load and store.
+
+3. Race Conditions
+If two cores (or software threads) try to update shared_counter at the same time, the value may be corrupted.
+
+Atomic operations protect against this.
+
+Task 15.C
+```C
+volatile int shared_counter = 0;
+
+void main() {
+    while (1) {
+        shared_counter++;
+        for (volatile int i = 0; i < 100000; ++i); // delay
+    }
+}
+```
+Task link15.ld
+```ld
+OUTPUT_ARCH(riscv)
+ENTRY(_start)
+
+MEMORY
+{
+  RAM (rwx) : ORIGIN = 0x80000000, LENGTH = 128K
+}
+
+SECTIONS
+{
+  .text : {
+    *(.text*)
+    *(.rodata*)
+  } > RAM
+
+  .data : {
+    *(.data*)
+  } > RAM
+
+  .bss : {
+    *(.bss*)
+    *(COMMON)
+  } > RAM
+}
+```
+Task 15.S
+```s
+.section .text
+.global _start
+_start:
+    la sp, _stack_top     # set stack pointer
+    call main             # call main
+    j .                   # infinite loop if main returns
+
+.section .bss
+.space 4096
+_stack_top:
+```
+Compiled Using 
+```bash
+riscv32-unknown-elf-gcc -g -nostartfiles -T link15.ld start15.S task15.c -o task15.elf
+```
+Emulated via QEMU 
+```bash
+qemu-system-riscv32 -machine virt -nographic -bios none -kernel task15.elf -S -gdb tcp::1234
+```
+Connected GDB to QEMU
+```bash
+riscv32-unknown-elf-gdb task15.elf
+```
+GDB Commands:
+```gdb
+target main :1234
+b main
+c
+print shared_counter
+info registers
+```
+### Screenshots
+
