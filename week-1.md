@@ -179,7 +179,7 @@ No debug symbols: Recompile with -g flag.
 Architecture issues: In GDB, run set architecture riscv:rv32.
 
 ### Screenshot
-![Screenshot of result](Screenshots/Task6.png)
+![Screenshot of result](ss/Task6.png)
 
 We didnt see the expected result as we weren't using emulator.This hasn been addressed in task 7. 
 
@@ -239,8 +239,10 @@ No debug symbols: Recompile with -g flag.
 Architecture issues: In GDB, run set architecture riscv:rv32.
 
 ### Screenshot
-![Screenshot of result](Screenshots/Task7.png)
-
+![Screenshot of result](ss/Task7(1).png)
+![Screenshot of result](ss/Task7(2).png)
+![Screenshot of result](ss/Task7(3).png)
+![Screenshot of result](ss/Task7(4).png)
 Here's a clean, professional README.md for your GitHub repository covering Task 8 (GCC Optimization Analysis):
 
 markdown
@@ -302,7 +304,7 @@ Compare the files using
 diff -y hello-O0.s hello-O2.s
 ```
 ### Screenshots
-![Screenshot of result](Screenshots/Task8.png)
+![Screenshot of result](ss/Task8.png)
 
 ## Task 9: Inline Assembly for Reading RISC-V Cycle Counter
 Objective: Learn to read the RISC-V cycle CSR (Counter Register) using inline assembly in C, with detailed explanations of constraints and keywords.
@@ -514,7 +516,7 @@ Have .data and .bss in SRAM at 0x10000000+
 Link without errors or section overlap
 
 ### Screenshots 
-![Screenshot of result](Screenshots/Task11.png)
+![Screenshot of result](ss/Task11.png)
 
 # Task 12: Start-up Code and `crt0` – RISC-V Bare-Metal
 
@@ -623,7 +625,7 @@ main() runs without an OS.
 
 Compatible with simulators like QEMU or Spike.
 ### Screenshots 
-![Screenshot of result](Screenshots/Task12.png)
+![Screenshot of result](ss/Task12.png)
 
 ## Task 13: Demonstrate how to make a machine-Timer-Interrupt(MITP),Simple handler in C:
 Enable the Machine Timer Interrupt (MTIP)
@@ -687,7 +689,7 @@ Set the mtvec register to handle traps
 Successfully created a timer-based event system
 
 ### Screenshots
-![Screenshot of result](Screenshots/Task13.png)
+![Screenshot of result](ss/Task13.png)
 
 ## Task 14: rv32imac vs rv32imc – What’s the “A”?
 Question 
@@ -820,7 +822,7 @@ GDB Commands
 (gdb)info registers
 ```
 ### ScreenShots
-![Screenshot of result](Screenshots/Task15.png)
+![Screenshot of result](ss/Task15.png)
 
 ## Task 16:Using Newlib printf Without an OS
 
@@ -926,7 +928,7 @@ GDB Commands
 (gdb)print shared_counter
 ```
 ### ScreenShots
-![Screenshot of result](Screenshots/Task16.png)
+![Screenshot of result](ss/Task16.png)
 
 ## Task 17: RISC-V Bare-Metal – Thread Scheduling and Mutex (Using qemu-riscv32, GDB, and Atomics)
 Objective
@@ -1064,4 +1066,4 @@ GDB Commands
 (gdb)print shared_counter
 ```
 ### ScreenShots
-![Screenshot of result](Screenshots/Task17.png)	
+![Screenshot of result](ss/Task17.png)	
